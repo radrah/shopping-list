@@ -10,11 +10,13 @@ It stores the listed items in local storage until deleted.
 3. Run ```parcel filename.html```
 4. Or Open the file on a browser(local).
 
-### Add Item
+-------
+
+### Adding Items
 ![Add Item](AddItem.png)
 
-### Delete Item
+### Deleting Items
 ![Delete Item](DeleteItem.png)
 
-### Check off Item
+### Checking off Items
 ![Check Off Item](CheckedItem.png)
