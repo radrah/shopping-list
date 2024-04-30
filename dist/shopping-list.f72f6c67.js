@@ -117,62 +117,85 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"../../../../../../../opt/homebrew/lib/node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
-var bundleURL = null;
-function getBundleURLCached() {
-  if (!bundleURL) {
-    bundleURL = getBundleURL();
-  }
-  return bundleURL;
-}
-function getBundleURL() {
-  // Attempt to find the URL of the current script and use that as the base URL
-  try {
-    throw new Error();
-  } catch (err) {
-    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
-    if (matches) {
-      return getBaseURL(matches[0]);
-    }
-  }
-  return '/';
-}
-function getBaseURL(url) {
-  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)?\/[^/]+(?:\?.*)?$/, '$1') + '/';
-}
-exports.getBundleURL = getBundleURLCached;
-exports.getBaseURL = getBaseURL;
-},{}],"../../../../../../../opt/homebrew/lib/node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
-var bundle = require('./bundle-url');
-function updateLink(link) {
-  var newLink = link.cloneNode();
-  newLink.onload = function () {
-    link.remove();
+})({"shopping-list.js":[function(require,module,exports) {
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var shoppingForm = document.querySelector('.shopping');
+var shoppingList = document.querySelector('.list');
+
+// Holds the state of the application in an array - (the items we input)
+var items = [];
+function handleSubmit(event) {
+  event.preventDefault();
+  var name = event.target.item.value.trim();
+  if (!name) return alert('noname');
+  var item = {
+    name: name,
+    id: Date.now(),
+    complete: false
   };
-  newLink.href = link.href.split('?')[0] + '?' + Date.now();
-  link.parentNode.insertBefore(newLink, link.nextSibling);
+  items.push(item);
+  event.target.reset();
+
+  //  fire off a custom event to tell others that the items have been updated
+  shoppingList.dispatchEvent(new CustomEvent('itemsUpdated'));
 }
-var cssTimeout = null;
-function reloadCSS() {
-  if (cssTimeout) {
-    return;
+function displayItems() {
+  var html = items.map(function (item) {
+    return "<li class=\"shopping-item\">\n        <input \n        type=\"checkbox\" \n        value=\"".concat(item.id, "\"\n        ").concat(item.complete && 'checked', "\n        \">\n        <span class=\"itemName\">").concat(item.name, "</span>\n        <button \n        aria-label=\"Remove ").concat(item.name, "\"\n        value=\"").concat(item.id, "\"\n        >&times;</>\n    </li>");
+  }).join('');
+  shoppingList.innerHTML = html;
+}
+function deleteItem(id) {
+  // items.forEach(itemO => {
+  //     if(itemO.id == id){
+  //     let itemIndex = items.indexOf(itemO);
+  //     items.splice(itemIndex, 1);
+  // }});
+
+  items = items.filter(function (item) {
+    return item.id !== id;
+  });
+  shoppingList.dispatchEvent(new CustomEvent('itemsUpdated'));
+}
+function markAsComplete(id) {
+  var itemRef = items.find(function (item) {
+    return item.id === id;
+  });
+  itemRef.complete = !itemRef.complete;
+  shoppingList.dispatchEvent(new CustomEvent('itemsUpdated'));
+}
+function mirrorToLocalStorage() {
+  localStorage.setItem('items', JSON.stringify(items));
+}
+function restoreFromLocalStorage() {
+  var lsItems = JSON.parse(localStorage.getItem('items'));
+  console.log(lsItems);
+  if (lsItems.length) {
+    var _items;
+    (_items = items).push.apply(_items, _toConsumableArray(lsItems));
+    shoppingList.dispatchEvent(new CustomEvent('itemsUpdated'));
   }
-  cssTimeout = setTimeout(function () {
-    var links = document.querySelectorAll('link[rel="stylesheet"]');
-    for (var i = 0; i < links.length; i++) {
-      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
-        updateLink(links[i]);
-      }
-    }
-    cssTimeout = null;
-  }, 50);
 }
-module.exports = reloadCSS;
-},{"./bundle-url":"../../../../../../../opt/homebrew/lib/node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"shopping.css":[function(require,module,exports) {
-var reloadCSS = require('_css_loader');
-module.hot.dispose(reloadCSS);
-module.hot.accept(reloadCSS);
-},{"_css_loader":"../../../../../../../opt/homebrew/lib/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"../../../../../../../opt/homebrew/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+shoppingForm.addEventListener('submit', handleSubmit);
+shoppingList.addEventListener('itemsUpdated', displayItems);
+shoppingList.addEventListener('itemsUpdated', mirrorToLocalStorage);
+
+//Listens to the list for click but only works if clicked on a button
+shoppingList.addEventListener('click', function (event) {
+  if (event.target.matches('button')) {
+    deleteItem(parseInt(event.target.value));
+  }
+  if (event.target.matches('input[type="checkbox"]')) {
+    markAsComplete(parseInt(event.target.value));
+  }
+});
+restoreFromLocalStorage();
+},{}],"../../../../../../../opt/homebrew/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -341,5 +364,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../../../../../../../opt/homebrew/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js"], null)
-//# sourceMappingURL=/shopping.c64a7cbe.js.map
+},{}]},{},["../../../../../../../opt/homebrew/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","shopping-list.js"], null)
+//# sourceMappingURL=/shopping-list.f72f6c67.js.map

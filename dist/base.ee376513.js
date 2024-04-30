@@ -168,7 +168,7 @@ function reloadCSS() {
   }, 50);
 }
 module.exports = reloadCSS;
-},{"./bundle-url":"../../../../../../../opt/homebrew/lib/node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"shopping.css":[function(require,module,exports) {
+},{"./bundle-url":"../../../../../../../opt/homebrew/lib/node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"base.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 module.hot.dispose(reloadCSS);
 module.hot.accept(reloadCSS);
@@ -342,4 +342,4 @@ function hmrAcceptRun(bundle, id) {
   }
 }
 },{}]},{},["../../../../../../../opt/homebrew/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js"], null)
-//# sourceMappingURL=/shopping.c64a7cbe.js.map
+//# sourceMappingURL=/base.ee376513.js.map
